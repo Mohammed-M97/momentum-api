@@ -59,7 +59,17 @@ All auth routes are public.
 { "email": "me@example.com", "password": "hunter2" }
 ```
 
-`201` → `{ "id": "...", "email": "me@example.com" }`
+`201` →
+
+```json
+{
+  "success": true,
+  "data": { "id": "...", "email": "me@example.com", "token": "eyJhbGci..." }
+}
+```
+
+Registering logs you in — the response already carries a token, so there is no need
+to call `/auth/login` right after.
 
 #### `POST /auth/login`
 
@@ -67,9 +77,16 @@ All auth routes are public.
 { "email": "me@example.com", "password": "hunter2" }
 ```
 
-`200` → `{ "id": "...", "email": "me@example.com", "token": "eyJhbGci..." }`
+`200` →
 
-`401` on a bad email or password — the same generic `Invalid credentials` message either way, so the endpoint doesn't leak which emails are registered.
+```json
+{
+  "success": true,
+  "data": { "id": "...", "email": "me@example.com", "token": "eyJhbGci..." }
+}
+```
+
+A bad email and a bad password both return the same `401` → `{ "success": false, "message": "Invalid credentials" }`, so the endpoint doesn't leak which emails are registered.
 
 ### Tasks
 
@@ -89,7 +106,7 @@ Missing or malformed header → `401 No token provided`. Expired or invalid toke
 | `PUT` | `/tasks/:id` | Update allowed fields |
 | `DELETE` | `/tasks/:id` | Soft-delete a task |
 
-Responses follow a consistent envelope:
+Auth and task routes answer with the same envelope:
 
 ```json
 { "success": true, "data": { ... } }
@@ -98,6 +115,8 @@ Responses follow a consistent envelope:
 ```json
 { "success": false, "message": "Task not found" }
 ```
+
+The one exception is `verifyToken`, which rejects with a bare `{ "message": "..." }`.
 
 #### Task shape
 
@@ -136,7 +155,7 @@ curl -X POST localhost:3000/auth/register \
 # log in and grab the token
 TOKEN=$(curl -s -X POST localhost:3000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"me@example.com","password":"hunter2"}' | jq -r .token)
+  -d '{"email":"me@example.com","password":"hunter2"}' | jq -r .data.token)
 
 # create a task
 curl -X POST localhost:3000/tasks \
@@ -165,5 +184,5 @@ middleware/
 ## Notes
 
 - `.env` is gitignored; `.env.example` documents the variables it needs.
-- `POST /auth/register` signs a token but doesn't return it — clients call `/auth/login` after registering.
+- `POST /auth/register` returns a token alongside the new user, so a client can go straight from sign-up to authenticated requests.
 - No test suite yet; `npm test` is still the npm placeholder.

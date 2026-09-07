@@ -16,7 +16,7 @@ router.post("/register", async (req, res) => {
       expiresIn: "1h",
     });
 
-    res.status(201).json({ id: user._id, email: user.email });
+    res.status(201).json({ success: true, data: { id: user._id, email: user.email, token } });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -29,20 +29,20 @@ router.post("/login", async (req, res) => {
     const findUser = await User.findOne({ email });
 
     if (!findUser) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, findUser.password);
 
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 
     const token = jwt.sign({ id: findUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    res.status(200).json({ id: findUser._id, email: findUser.email, token });
+    res.status(200).json({ success: true, data: { id: findUser._id, email: findUser.email, token } });
   } catch (error) {
     res.status(400).json({
       success: false,
