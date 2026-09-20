@@ -10,8 +10,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-const todosRouter = require("./routes/tasks");
-app.use("/tasks", todosRouter);
+app.use("/tasks", require("./routes/tasks"));
+app.use("/goals", require("./routes/goals"));
 app.use("/auth", require("./routes/auth"));
 const mongoose = require("mongoose");
 
