@@ -13,6 +13,15 @@ app.use(express.json());
 app.use("/tasks", require("./routes/tasks"));
 app.use("/goals", require("./routes/goals"));
 app.use("/auth", require("./routes/auth"));
+
+app.use((err, req, res, next) => {
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({ success: false, message: "Invalid JSON body" });
+  }
+  console.error(err);
+  res.status(500).json({ success: false, message: "Server error" });
+});
+
 const mongoose = require("mongoose");
 
 mongoose
