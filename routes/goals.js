@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Goal = require("../models/Goal");
+const Task = require("../models/Task")
 const verifyToken = require("../middleware/verifyToken");
 router.use(verifyToken);
 
