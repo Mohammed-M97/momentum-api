@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Goal = require("../models/Goal");
-const Task = require("../models/Task")
+const Task = require("../models/Task");
 const verifyToken = require("../middleware/verifyToken");
 router.use(verifyToken);
 
@@ -78,6 +78,14 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const goalId = req.params.id;
+    let mode = req.query.tasks;
+
+    if (mode === undefined) mode = "unlink";
+    if (mode !== "unlink" && mode !== "delete") {
+      return res
+        .status(400)
+        .json({ success: false, message: "mode not found" });
+    }
 
     const data = await Goal.findOneAndUpdate(
       { _id: goalId, user: req.userId, deletedAt: null },
@@ -91,10 +99,16 @@ router.delete("/:id", async (req, res) => {
         .json({ success: false, message: "Goal not found" });
     }
 
+    let taskResult = await Task.updateMany(
+      { user: req.userId, goalId: goalId, deletedAt: null },
+      { deletedAt: new Date(), goalId: null },
+    );
+
     res.status(200).json({
       success: true,
       message: "Goal successfully deleted",
       data: data,
+      tasksAffected: taskResult.modifiedCount
     });
   } catch (error) {
     if (error.name === "CastError") {
