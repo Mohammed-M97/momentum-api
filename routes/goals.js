@@ -99,16 +99,21 @@ router.delete("/:id", async (req, res) => {
         .json({ success: false, message: "Goal not found" });
     }
 
-    let taskResult = await Task.updateMany(
-      { user: req.userId, goalId: goalId, deletedAt: null },
-      { deletedAt: new Date(), goalId: null },
-    );
+    const filter = { user: req.userId, goalId: goalId, deletedAt: null };
+    let change;
+    if (mode === "delete") {
+      change = { deletedAt: new Date() };
+    } else {
+      change = { goalId: null };
+    }
+    const taskResult = await Task.updateMany(filter, change);
+
 
     res.status(200).json({
       success: true,
       message: "Goal successfully deleted",
       data: data,
-      tasksAffected: taskResult.modifiedCount
+      tasksAffected: taskResult.modifiedCount,
     });
   } catch (error) {
     if (error.name === "CastError") {
