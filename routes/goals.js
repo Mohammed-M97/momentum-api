@@ -84,7 +84,7 @@ router.delete("/:id", async (req, res) => {
     if (mode !== "unlink" && mode !== "delete") {
       return res
         .status(400)
-        .json({ success: false, message: "mode not found" });
+        .json({ success: false, message: "tasks must be 'unlink' or 'delete'" });
     }
 
     const data = await Goal.findOneAndUpdate(
