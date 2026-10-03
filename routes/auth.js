@@ -16,18 +16,21 @@ router.post("/register", async (req, res) => {
         .json({ success: false, message: "Registration is closed" });
     }
     const allowed = ["email", "password"];
-    const user = await User.create(req.body);
+    const fields = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) fields[key] = req.body[key];
+    }
+    
+    const user = await User.create(fields);
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: { id: user._id, email: user.email, token },
-      });
+    res.status(201).json({
+      success: true,
+      data: { id: user._id, email: user.email, token },
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -57,12 +60,10 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        data: { id: findUser._id, email: findUser.email, token },
-      });
+    res.status(200).json({
+      success: true,
+      data: { id: findUser._id, email: findUser.email, token },
+    });
   } catch (error) {
     res.status(400).json({
       success: false,
