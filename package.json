@@ -1,7 +1,7 @@
 {
-  "name": "todo-api",
+  "name": "momentum-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "REST API for a personal todo manager with goals, built with Express 5, MongoDB and JWT auth",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
@@ -9,15 +9,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Mohammed-M97",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongodb": "^7.4.0",
     "mongoose": "^9.7.3"
   },
   "devDependencies": {

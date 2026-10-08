@@ -32,6 +32,9 @@ router.post("/register", async (req, res) => {
       data: { id: user._id, email: user.email, token },
     });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ success: false, message: "Email already registered" });
+    }
     res.status(400).json({ success: false, message: error.message });
   }
 });

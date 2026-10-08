@@ -32,7 +32,7 @@ mongoose
 
 
 app.get("/", (req, res) => {
-  res.send("Todo API is alive");
+  res.send("Momentum API is alive");
 });
 
 app.listen(port, () => {
