@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || "127.0.0.1";
 
 const corsOrigin = process.env.CORS_ORIGIN;
 if (!corsOrigin) throw new Error("CORS_ORIGIN is not set");
@@ -16,7 +17,9 @@ app.use("/auth", require("./routes/auth"));
 
 app.use((err, req, res, next) => {
   if (err.type === "entity.parse.failed") {
-    return res.status(400).json({ success: false, message: "Invalid JSON body" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid JSON body" });
   }
   console.error(err);
   res.status(500).json({ success: false, message: "Server error" });
@@ -29,12 +32,10 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ Mongo error:", err.message));
 
-
-
 app.get("/", (req, res) => {
   res.send("Momentum API is alive");
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.listen(port, host, () => {
+  console.log(`Server listening on ${host}:${port}`);
 });
