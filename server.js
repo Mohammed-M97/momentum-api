@@ -8,7 +8,7 @@ const host = process.env.HOST || "127.0.0.1";
 const corsOrigin = process.env.CORS_ORIGIN;
 if (!corsOrigin) throw new Error("CORS_ORIGIN is not set");
 
-app.use(cors({ origin: corsOrigin }));
+app.use(cors({ origin: corsOrigin, maxAge: 86400 }));
 app.use(express.json());
 
 app.use("/tasks", require("./routes/tasks"));
