@@ -53,7 +53,7 @@ HOST=127.0.0.1
 
 - `JWT_SECRET` is required — the server throws on startup if it is missing.
 - `ALLOW_REGISTER` must be exactly `true` for `POST /auth/register` to work. Leave it unset (or anything else) to close registration; existing users can still log in.
-- `CORS_ORIGIN` is required — the frontend URL allowed to call the API. The server throws on startup if it is missing.
+- `CORS_ORIGIN` is required — the frontend URL allowed to call the API. Several URLs can be listed, separated by commas. The server throws on startup if it is missing.
 - `ALLOW_DEMO` must be exactly `true` for `POST /auth/demo` to work.
 - `PORT` and `HOST` are optional and default to `3000` and `127.0.0.1`.
 

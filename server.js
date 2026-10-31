@@ -8,7 +8,10 @@ const host = process.env.HOST || "127.0.0.1";
 const corsOrigin = process.env.CORS_ORIGIN;
 if (!corsOrigin) throw new Error("CORS_ORIGIN is not set");
 
-app.use(cors({ origin: corsOrigin, maxAge: 86400 }));
+/* Comma-separated list, so more than one frontend can call the API
+   (e.g. the public site and the personal installable version). */
+const allowedOrigins = corsOrigin.split(",").map((o) => o.trim()).filter(Boolean);
+app.use(cors({ origin: allowedOrigins, maxAge: 86400 }));
 app.use(express.json());
 
 app.use("/tasks", require("./routes/tasks"));
