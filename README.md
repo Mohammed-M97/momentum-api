@@ -9,13 +9,13 @@ authenticated user — you can only ever see and modify your own data.
 
 - **Email + password auth** — passwords hashed with bcrypt via a Mongoose `pre("save")` hook, so plaintext never reaches the database.
 - **Registration switch** — sign-up is closed unless `ALLOW_REGISTER=true`, so a deployed instance can stay private.
-- **JWT sessions** — tokens signed with `JWT_SECRET`, valid for 1 hour, sent as `Authorization: Bearer <token>`.
+- **JWT sessions** — tokens signed with `JWT_SECRET`, valid for 12 hours (2 for demo accounts), sent as `Authorization: Bearer <token>`.
 - **Tasks and goals** — tasks can be linked to a goal via `goalId`; deleting a goal either unlinks or deletes its tasks.
 - **Per-user isolation** — `verifyToken` puts the user id on the request, and every task and goal query filters by `user: req.userId`.
 - **Soft deletes** — `DELETE` sets a `deletedAt` timestamp instead of removing the document; all reads filter on `deletedAt: null`, so nothing is ever lost.
 - **Whitelisted updates** — `POST` and `PUT` only apply fields from an explicit allow-list, so clients cannot overwrite `user`, `deletedAt`, or anything else internal.
 - **Clean JSON output** — a `toJSON` transform renames `_id` to `id` and strips `__v` and the internal `user` field.
-- **CORS from env** — the allowed origin comes from `CORS_ORIGIN` (required), and preflight responses are cached for 24h (`maxAge`) to cut down on `OPTIONS` requests.
+- **CORS from env** — the allowed origin comes from `CORS_ORIGIN` (required), optionally plus preview deployments via `CORS_PREVIEW_SUFFIX`, and preflight responses are cached for 24h (`maxAge`) to cut down on `OPTIONS` requests.
 - **Demo mode** — `POST /auth/demo` creates a throwaway user pre-filled with sample goals and tasks, so visitors can try the app without signing up. Demo accounts expire after 2 hours.
 - **Demo protection** — demo sessions are rate-limited (5 per hour per IP), capped at 200 active at once, and can be switched off entirely with `ALLOW_DEMO`.
 - **Demo cleanup script** — `npm run cleanup:demo` deletes expired demo users together with their goals and tasks.
@@ -54,6 +54,7 @@ HOST=127.0.0.1
 - `JWT_SECRET` is required — the server throws on startup if it is missing.
 - `ALLOW_REGISTER` must be exactly `true` for `POST /auth/register` to work. Leave it unset (or anything else) to close registration; existing users can still log in.
 - `CORS_ORIGIN` is required — the frontend URL allowed to call the API. The server throws on startup if it is missing.
+- `CORS_PREVIEW_SUFFIX` is optional — also allows any `https://` origin whose host ends with it, for preview deployments (e.g. `.momentum-app-dqn.pages.dev`). Leave it unset to allow only `CORS_ORIGIN`.
 - `ALLOW_DEMO` must be exactly `true` for `POST /auth/demo` to work.
 - `PORT` and `HOST` are optional and default to `3000` and `127.0.0.1`.
 

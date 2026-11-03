@@ -17,6 +17,9 @@ if (!process.env.JWT_SECRET) {
 const DEMO_HOURS = 2;
 const DEMO_CAP = 200;
 
+// Real accounts stay signed in this long before logging in again
+const USER_TOKEN_HOURS = 12;
+
 // Max 5 demo sessions per IP per hour (CF-Connecting-IP is the real client IP behind Cloudflare)
 const demoLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -107,7 +110,7 @@ router.post("/register", async (req, res) => {
     const user = await User.create(fields);
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: `${USER_TOKEN_HOURS}h`,
     });
 
     res.status(201).json({
@@ -146,7 +149,7 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign({ id: findUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: `${USER_TOKEN_HOURS}h`,
     });
 
     res.status(200).json({

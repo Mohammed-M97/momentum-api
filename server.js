@@ -8,7 +8,25 @@ const host = process.env.HOST || "127.0.0.1";
 const corsOrigin = process.env.CORS_ORIGIN;
 if (!corsOrigin) throw new Error("CORS_ORIGIN is not set");
 
-app.use(cors({ origin: corsOrigin, maxAge: 86400 }));
+// Optional: also allow the frontend's preview deployments, e.g.
+// CORS_PREVIEW_SUFFIX=.momentum-app-dqn.pages.dev matches https://<anything>.momentum-app-dqn.pages.dev
+const previewSuffix = process.env.CORS_PREVIEW_SUFFIX;
+const isPreview = (origin) => {
+  if (!previewSuffix || !origin) return false;
+  try {
+    const { protocol, hostname } = new URL(origin);
+    return protocol === "https:" && hostname.endsWith(previewSuffix);
+  } catch {
+    return false;
+  }
+};
+
+app.use(
+  cors({
+    origin: (origin, cb) => cb(null, origin === corsOrigin || isPreview(origin) ? origin : false),
+    maxAge: 86400,
+  }),
+);
 app.use(express.json());
 
 app.use("/tasks", require("./routes/tasks"));
